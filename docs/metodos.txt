@@ -1,0 +1,17 @@
+algoritmos de ordenação
+Metodos Sort
+    Bubble Sort
+    Insertion Sort
+    Selection Sort
+    Merge Sort
+    Quick Sort
+    Heap Sort
+
+repetição para cada Metodo Sort
+    • Crescente com repetição
+    • Decrescente com repetição
+    • Aleatório com repetição
+    • Crescente sem repetição
+    • Decrescente sem repetição
+    • Aleatório sem repetição
+    
