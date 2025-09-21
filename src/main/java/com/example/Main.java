@@ -1,19 +1,20 @@
 package com.example;
 //import Sort.BubbleSort;
 
+import com.example.model.Benchmark;
+import com.example.model.QuickSort;
+import com.example.model.ResultadoBenchmark;
+import com.example.model.SortAlgorithm;
+import com.example.model.TipoVetor;
+
 public class Main {
     public static void main(String[] args) {
 
-        // cria o vetor 
-        double[] resultados = {1.2222, 3.4567, 4.8910};
-        Dados dado = new Dados("bubble", resultados);
-        
-        // Print the Resultado details (you can add getters for these details)
-        System.out.println("nome do Sort: " + dado.getNome()); // printa o nome
-        
-        System.out.print("Resultados: ");
-        for (double res : dado.getResultados()) {// printa os resultados
-            System.out.print(res + " / ");
-        }
+        // Em um método main para teste:
+        SortAlgorithm quick = new QuickSort();
+        ResultadoBenchmark resultado = Benchmark.executar(quick, TipoVetor.ALEATORIO_COM_REPETICAO, 50000);
+        System.out.println(resultado);
+        // Saída esperada: Algoritmo: Quick Sort | Tamanho: 50000 | ... | Tempo Médio: X
+        // ms
     }
 }
