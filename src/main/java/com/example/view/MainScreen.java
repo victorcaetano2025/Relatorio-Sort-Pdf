@@ -153,7 +153,7 @@ public class MainScreen extends JFrame {
                     progressBar.setString("Gerando gráficos...");
                     Map<TipoVetor, List<ResultadoBenchmark>> resultadosAgrupados = allResults.stream().collect(Collectors.groupingBy(ResultadoBenchmark::getTipoVetor));
                     for(Map.Entry<TipoVetor, List<ResultadoBenchmark>> entry : resultadosAgrupados.entrySet()) {
-                        File chartFile = ChartGenerator.createBarChart(entry.getKey().toString(), entry.getValue());
+                        File chartFile = ChartGenerator.createPieChart3D(entry.getKey().toString(), entry.getValue());
                         chartFiles.put(entry.getKey(), chartFile);
                     }
                 }
