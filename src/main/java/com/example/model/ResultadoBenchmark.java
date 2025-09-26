@@ -40,4 +40,14 @@ public class ResultadoBenchmark {
             df.format(tempoMedioEmMilisegundos)
         );
     }
+
+    public Integer getTamanhoEntrada() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getTamanhoEntrada'");
+    }
+
+    public Double getTempoExecucao() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getTempoExecucao'");
+    }
 }

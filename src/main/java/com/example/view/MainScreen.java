@@ -8,11 +8,8 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 // Classe auxiliar para passar múltiplos resultados do SwingWorker
@@ -34,7 +31,6 @@ public class MainScreen extends JFrame {
     private JProgressBar progressBar = new JProgressBar();
 
     public MainScreen() {
-        // ... (código do construtor e inicialização não muda)
         setTitle("Gerador de Relatórios de Algoritmos");
         setSize(700, 450);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -48,7 +44,6 @@ public class MainScreen extends JFrame {
     }
 
     private void initializeMaps() {
-        // ... (código não muda)
         algorithmMap.put(new JCheckBox("QuickSort"), new QuickSort());
         algorithmMap.put(new JCheckBox("MergeSort"), new MergeSort());
         algorithmMap.put(new JCheckBox("HeapSort"), new HeapSort());
@@ -65,9 +60,8 @@ public class MainScreen extends JFrame {
         sizeMap.put(new JCheckBox("640.000"), 640000);
         sizeMap.put(new JCheckBox("700.000"), 700000);
     }
-    
+
     private JPanel createSettingsPanel() {
-        // ... (código não muda, mas agora usamos os campos da classe para os checkboxes de saída)
         JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
         JPanel pnlTamanhosInterno = new JPanel();
         pnlTamanhosInterno.setLayout(new BoxLayout(pnlTamanhosInterno, BoxLayout.Y_AXIS));
@@ -87,9 +81,8 @@ public class MainScreen extends JFrame {
         panel.add(pnlSaida);
         return panel;
     }
-    
-    // ... (outros métodos de criar painel não mudam)
-     private JPanel createAlgorithmPanel() {
+
+    private JPanel createAlgorithmPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new TitledBorder("Algoritmos"));
@@ -98,6 +91,7 @@ public class MainScreen extends JFrame {
         }
         return panel;
     }
+
     private JPanel createActionPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 5));
         btnGerarRelatorio.setFont(new Font("Arial", Font.BOLD, 16));
@@ -110,21 +104,27 @@ public class MainScreen extends JFrame {
         return panel;
     }
 
-
     private void onGerarRelatorioClick() {
-        // --- Coleta as seleções ---
-        List<SortAlgorithm> selectedAlgorithms = new ArrayList<>();
-        algorithmMap.entrySet().stream().filter(e -> e.getKey().isSelected()).forEach(e -> selectedAlgorithms.add(e.getValue()));
-        List<Integer> selectedSizes = new ArrayList<>();
-        sizeMap.entrySet().stream().filter(e -> e.getKey().isSelected()).forEach(e -> selectedSizes.add(e.getValue()));
+        List<SortAlgorithm> selectedAlgorithms = algorithmMap.entrySet()
+                .stream()
+                .filter(e -> e.getKey().isSelected())
+                .map(Map.Entry::getValue)
+                .toList();
 
-        // --- Pega a seleção do tipo de saída ---
+        List<Integer> selectedSizes = sizeMap.entrySet()
+                .stream()
+                .filter(e -> e.getKey().isSelected())
+                .map(Map.Entry::getValue)
+                .toList();
+
         final boolean isChartSelected = chkOutputGrafico.isSelected();
         final boolean isTableSelected = chkOutputTabela.isSelected();
 
-        // --- Validação ---
         if (selectedAlgorithms.isEmpty() || selectedSizes.isEmpty() || (!isChartSelected && !isTableSelected)) {
-            JOptionPane.showMessageDialog(this, "Por favor, selecione pelo menos um algoritmo, um tamanho e um formato de saída (Tabela e/ou Gráfico).", "Seleção Inválida", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Selecione pelo menos um algoritmo, um tamanho e um formato de saída (Tabela e/ou Gráfico).",
+                    "Seleção Inválida",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -132,11 +132,9 @@ public class MainScreen extends JFrame {
         progressBar.setIndeterminate(true);
         progressBar.setString("Executando benchmarks...");
 
-        // Assinatura do SwingWorker atualizada para retornar nosso objeto WorkerResult
         SwingWorker<WorkerResult, Void> worker = new SwingWorker<>() {
             @Override
             protected WorkerResult doInBackground() throws Exception {
-                // Roda os benchmarks (não muda)
                 List<ResultadoBenchmark> allResults = new ArrayList<>();
                 for (SortAlgorithm algoritmo : selectedAlgorithms) {
                     for (Integer tamanho : selectedSizes) {
@@ -146,31 +144,35 @@ public class MainScreen extends JFrame {
                         }
                     }
                 }
-                
-                // --- NOVO: Gera os gráficos se selecionado ---
+
                 Map<TipoVetor, File> chartFiles = new HashMap<>();
                 if (isChartSelected) {
                     progressBar.setString("Gerando gráficos...");
-                    Map<TipoVetor, List<ResultadoBenchmark>> resultadosAgrupados = allResults.stream().collect(Collectors.groupingBy(ResultadoBenchmark::getTipoVetor));
-                    for(Map.Entry<TipoVetor, List<ResultadoBenchmark>> entry : resultadosAgrupados.entrySet()) {
-                        File chartFile = ChartGenerator.createPieChart3D(entry.getKey().toString(), entry.getValue());
+                    Map<TipoVetor, List<ResultadoBenchmark>> resultadosAgrupados =
+                            allResults.stream().collect(Collectors.groupingBy(ResultadoBenchmark::getTipoVetor));
+
+                    for (Map.Entry<TipoVetor, List<ResultadoBenchmark>> entry : resultadosAgrupados.entrySet()) {
+                        // Aqui cada gráfico vai mostrar todos os algoritmos lado a lado
+                        File chartFile = ChartGenerator.createBarChart(entry.getKey().toString(), entry.getValue());
                         chartFiles.put(entry.getKey(), chartFile);
                     }
                 }
-                
+
                 return new WorkerResult(allResults, chartFiles);
             }
 
             @Override
             protected void done() {
                 try {
-                    WorkerResult result = get(); // Pega o resultado completo
+                    WorkerResult result = get();
                     progressBar.setString("Gerando PDF...");
-                    // A chamada para o gerador de PDF agora envia os gráficos também
                     PdfGenerator.gerarComIText(result.benchmarkResults, result.chartFiles, MainScreen.this);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    JOptionPane.showMessageDialog(MainScreen.this, "Ocorreu um erro: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(MainScreen.this,
+                            "Ocorreu um erro: " + e.getMessage(),
+                            "Erro",
+                            JOptionPane.ERROR_MESSAGE);
                 } finally {
                     btnGerarRelatorio.setEnabled(true);
                     progressBar.setIndeterminate(false);
