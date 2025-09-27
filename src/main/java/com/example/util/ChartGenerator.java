@@ -179,7 +179,6 @@ public class ChartGenerator {
         plot.getDomainAxis().setTickLabelFont(new Font("Arial", Font.PLAIN, 14));
         plot.getRangeAxis().setTickLabelFont(new Font("Arial", Font.PLAIN, 14));
 
-
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
         for (int i = 0; i < CHART_COLORS.length; i++) {
             renderer.setSeriesPaint(i, CHART_COLORS[i]);
@@ -189,12 +188,7 @@ public class ChartGenerator {
         renderer.setDrawBarOutline(false);
 
         // Adiciona e formata os números acima das barras
-        renderer.setDefaultItemLabelsVisible(true);
-        renderer.setDefaultItemLabelPaint(Color.WHITE);
-        renderer.setDefaultItemLabelFont(new Font("Arial", Font.BOLD, 14));
-        renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}", new DecimalFormat("0.00")));
-        ItemLabelPosition p = new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER);
-        renderer.setDefaultPositiveItemLabelPosition(p);
+        renderer.setDefaultItemLabelsVisible(false); // << ALTERADO AQUI para não mostrar os números
     }
 
     /**

@@ -184,6 +184,6 @@ public class MainScreen extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new MainScreen().setVisible(true));
+          SwingUtilities.invokeLater(() -> new MainScreen().setVisible(true));
     }
 }

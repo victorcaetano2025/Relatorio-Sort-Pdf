@@ -91,7 +91,7 @@ public class PdfGenerator {
                     File chartFile = chartFiles.get(cenario);
                     if (chartFile != null && chartFile.exists()) {
                         Image pdfImage = new Image(ImageDataFactory.create(chartFile.getAbsolutePath()));
-                        pdfImage.setWidth(UnitValue.createPercentValue(100));
+                        pdfImage.setAutoScale(true); // << ALTERADO AQUI para a imagem caber na página
                         document.add(new Paragraph("\n"));
                         document.add(pdfImage);
                         chartFile.delete();
