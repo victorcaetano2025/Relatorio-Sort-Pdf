@@ -45,13 +45,11 @@ public class PdfGenerator {
         try {
             PdfWriter writer = new PdfWriter(fileName);
             PdfDocument pdfDoc = new PdfDocument(writer);
-            // Mudei para A4 retrato para a página de texto inicial
-            Document document = new Document(pdfDoc, PageSize.A4);
+            // Define que TODAS as páginas, a começar pela primeira, serão em modo paisagem
+            Document document = new Document(pdfDoc, PageSize.A4.rotate());
             document.setMargins(50, 50, 50, 50);
 
-            // --- NOVO CÓDIGO: ADICIONA A PÁGINA DE ANÁLISE TEÓRICA ---
             adicionarPaginaDeAnalise(document);
-            // --- FIM DO NOVO CÓDIGO ---
 
             DecimalFormat df = new DecimalFormat("#,##0.00");
             Iterator<Map.Entry<TipoVetor, List<ResultadoBenchmark>>> iterator = resultadosAgrupados.entrySet().iterator();
@@ -61,11 +59,10 @@ public class PdfGenerator {
                 TipoVetor cenario = entry.getKey();
                 List<ResultadoBenchmark> resultadosDoCenario = entry.getValue();
 
-                // Adiciona quebra de página e muda para paisagem para os resultados
-                document.add(new AreaBreak());
-                pdfDoc.setDefaultPageSize(PageSize.A4.rotate());
+                // Adiciona uma quebra de página para a tabela, mantendo o formato paisagem
+                document.add(new AreaBreak(PageSize.A4.rotate()));
 
-                // Adiciona o título
+                // Adiciona o título da página da tabela
                 document.add(new Paragraph("Relatório de Desempenho: " + cenario.toString())
                         .setBold().setFontSize(16).setTextAlignment(TextAlignment.CENTER).setMarginBottom(20));
 
@@ -86,13 +83,19 @@ public class PdfGenerator {
                 }
                 document.add(table);
 
-                // Adiciona o gráfico
+                // Adiciona o gráfico em uma NOVA PÁGINA
                 if (chartFiles != null && chartFiles.containsKey(cenario)) {
                     File chartFile = chartFiles.get(cenario);
                     if (chartFile != null && chartFile.exists()) {
+                        // CRIA UMA NOVA PÁGINA EM PAISAGEM ANTES DE ADICIONAR O GRÁFICO
+                        document.add(new AreaBreak(PageSize.A4.rotate()));
+
+                        // Adiciona um título também na página do gráfico para melhor contexto
+                        document.add(new Paragraph("Gráfico de Desempenho: " + cenario.toString())
+                                .setBold().setFontSize(16).setTextAlignment(TextAlignment.CENTER).setMarginBottom(20));
+
                         Image pdfImage = new Image(ImageDataFactory.create(chartFile.getAbsolutePath()));
-                        pdfImage.setAutoScale(true); // << ALTERADO AQUI para a imagem caber na página
-                        document.add(new Paragraph("\n"));
+                        pdfImage.setAutoScale(true); // Garante que o gráfico ocupe a página toda sem cortar
                         document.add(pdfImage);
                         chartFile.delete();
                     }
@@ -109,7 +112,6 @@ public class PdfGenerator {
         }
     }
 
-    // --- NOVO MÉTODO PARA GERAR A PÁGINA DE ANÁLISE ---
     private static void adicionarPaginaDeAnalise(Document document) throws IOException {
         PdfFont fontBold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
         PdfFont fontNormal = PdfFontFactory.createFont(StandardFonts.HELVETICA);
@@ -117,7 +119,6 @@ public class PdfGenerator {
         document.add(new Paragraph("Análise Teórica dos Algoritmos de Ordenação")
                 .setFont(fontBold).setFontSize(18).setTextAlignment(TextAlignment.CENTER).setMarginBottom(20));
 
-        // --- Algoritmos O(n²) ---
         document.add(new Paragraph("Algoritmos de Complexidade Quadrática - O(n²)")
                 .setFont(fontBold).setFontSize(14).setMarginTop(15).setMarginBottom(10));
         document.add(new Paragraph("Estes algoritmos são mais simples, mas sua eficiência cai drasticamente com o aumento dos dados. Seus melhores casos, no entanto, podem ser notavelmente rápidos.")
@@ -138,7 +139,6 @@ public class PdfGenerator {
                 "Caso Médio: O(n²)",
                 "Pior Caso: O(n²) — Ocorre quando a lista está em ordem inversa.");
 
-        // --- Algoritmos O(n log n) ---
         document.add(new Paragraph("Algoritmos de Complexidade Logarítmica Linear - O(n log n)")
                 .setFont(fontBold).setFontSize(14).setMarginTop(20).setMarginBottom(10));
         document.add(new Paragraph("Esses algoritmos são muito mais eficientes e escaláveis para grandes volumes de dados. Seus piores e melhores casos costumam ser os mesmos, o que os torna previsíveis e confiáveis.")

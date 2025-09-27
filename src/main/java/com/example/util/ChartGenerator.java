@@ -180,6 +180,10 @@ public class ChartGenerator {
         plot.getRangeAxis().setTickLabelFont(new Font("Arial", Font.PLAIN, 14));
 
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        
+        // Define a largura máxima da barra como 10% do espaço disponível
+        renderer.setMaximumBarWidth(0.1); // << ALTERAÇÃO APLICADA AQUI
+
         for (int i = 0; i < CHART_COLORS.length; i++) {
             renderer.setSeriesPaint(i, CHART_COLORS[i]);
         }
@@ -188,7 +192,7 @@ public class ChartGenerator {
         renderer.setDrawBarOutline(false);
 
         // Adiciona e formata os números acima das barras
-        renderer.setDefaultItemLabelsVisible(false); // << ALTERADO AQUI para não mostrar os números
+        renderer.setDefaultItemLabelsVisible(false);
     }
 
     /**
